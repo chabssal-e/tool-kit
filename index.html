@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TOOLKIT — 도구 모음</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#0D2B3E;
+    --panel:#123C52;
+    --panel-2:#16455F;
+    --line:#2C5F7C;
+    --line-soft:rgba(97,163,197,0.16);
+    --amber:#E8A33D;
+    --amber-soft:rgba(232,163,61,0.14);
+    --paper:#EDF3F5;
+    --paper-dim:#A9C2D1;
+    --mint:#8FD9C4;
+    --danger:#E8735A;
+    --font-display:'Space Grotesk', sans-serif;
+    --font-body:'Inter', sans-serif;
+    --font-mono:'IBM Plex Mono', monospace;
+    --radius:10px;
+  }
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; padding:0; }
+  body{
+    background:
+      repeating-linear-gradient(0deg, var(--line-soft) 0px, var(--line-soft) 1px, transparent 1px, transparent 32px),
+      repeating-linear-gradient(90deg, var(--line-soft) 0px, var(--line-soft) 1px, transparent 1px, transparent 32px),
+      var(--ink);
+    color:var(--paper);
+    font-family:var(--font-body);
+    min-height:100vh;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{ color:inherit; }
+  button{ font-family:inherit; cursor:pointer; }
+  :focus-visible{ outline:2px solid var(--amber); outline-offset:2px; }
+
+  .view{ display:none; }
+  .view.active{ display:block; }
+
+  /* ---------- shared ---------- */
+  .wrap{ max-width:960px; margin:0 auto; padding:0 24px; }
+  .eyebrow{
+    font-family:var(--font-mono);
+    font-size:12px;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    color:var(--mint);
+    display:flex; align-items:center; gap:8px;
+  }
+  .eyebrow::before{ content:''; width:16px; height:1px; background:var(--mint); display:inline-block; }
+
+  /* ---------- LANDING ---------- */
+  #view-landing .hero{
+    position:relative;
+    min-height:100vh;
+    display:flex; flex-direction:column; justify-content:center;
+    padding:80px 24px;
+    overflow:hidden;
+  }
+  .corner{
+    position:absolute; width:28px; height:28px; opacity:0.55;
+  }
+  .corner::before, .corner::after{ content:''; position:absolute; background:var(--paper-dim); }
+  .corner::before{ width:100%; height:1px; top:0; left:0; }
+  .corner::after{ width:1px; height:100%; top:0; left:0; }
+  .corner.tl{ top:24px; left:24px; }
+  .corner.tr{ top:24px; right:24px; transform:scaleX(-1); }
+  .corner.bl{ bottom:24px; left:24px; transform:scaleY(-1); }
+  .corner.br{ bottom:24px; right:24px; transform:scale(-1,-1); }
+
+  .hero-inner{ max-width:640px; margin:0 auto; text-align:center; }
+  .hero h1{
+    font-family:var(--font-display);
+    font-weight:700;
+    font-size:clamp(34px, 6vw, 58px);
+    line-height:1.15;
+    margin:20px 0 16px;
+    letter-spacing:-0.01em;
+  }
+  .hero h1 span{ color:var(--amber); }
+  .hero p{
+    font-size:17px;
+    line-height:1.7;
+    color:var(--paper-dim);
+    margin:0 auto 36px;
+    max-width:480px;
+  }
+  .cta{
+    font-family:var(--font-mono);
+    font-size:15px;
+    font-weight:600;
+    color:var(--ink);
+    background:var(--amber);
+    border:none;
+    padding:16px 32px;
+    border-radius:6px;
+    letter-spacing:0.02em;
+    transition:transform .15s ease, box-shadow .15s ease;
+    box-shadow:0 0 0 rgba(232,163,61,0);
+  }
+  .cta:hover{ transform:translateY(-2px); box-shadow:0 8px 24px rgba(232,163,61,0.25); }
+  .hero-foot{
+    margin-top:56px;
+    font-family:var(--font-mono);
+    font-size:12px;
+    color:var(--paper-dim);
+    letter-spacing:0.08em;
+  }
+  .readout-strip{
+    display:flex; gap:28px; justify-content:center; margin-top:44px; flex-wrap:wrap;
+  }
+  .readout{
+    font-family:var(--font-mono);
+    text-align:left;
+    border-left:2px solid var(--line);
+    padding-left:10px;
+  }
+  .readout .n{ font-size:20px; color:var(--mint); font-weight:600; }
+  .readout .l{ font-size:11px; color:var(--paper-dim); text-transform:uppercase; letter-spacing:0.08em; }
+
+  /* ---------- HUB ---------- */
+  .topbar{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:22px 0; border-bottom:1px solid var(--line);
+  }
+  .brand{ font-family:var(--font-display); font-weight:700; font-size:18px; letter-spacing:0.02em; display:flex; align-items:center; gap:10px; }
+  .brand .dot{ width:8px; height:8px; background:var(--amber); border-radius:50%; }
+  .back-link{
+    background:none; border:1px solid var(--line); color:var(--paper);
+    font-family:var(--font-mono); font-size:13px; padding:8px 14px; border-radius:6px;
+    display:flex; align-items:center; gap:6px;
+  }
+  .back-link:hover{ border-color:var(--amber); color:var(--amber); }
+  .search{
+    background:var(--panel); border:1px solid var(--line); color:var(--paper);
+    font-family:var(--font-mono); font-size:13px; padding:9px 14px; border-radius:6px;
+    width:180px;
+  }
+  .search::placeholder{ color:var(--paper-dim); }
+
+  .hub-head{ padding:36px 0 8px; }
+  .hub-head h2{ font-family:var(--font-display); font-size:28px; margin:10px 0 6px; }
+  .hub-head p{ color:var(--paper-dim); margin:0 0 20px; font-size:14px; }
+
+  .grid{
+    display:grid; grid-template-columns:repeat(3, 1fr); gap:14px;
+    padding-bottom:80px;
+  }
+  @media (max-width:720px){ .grid{ grid-template-columns:repeat(2,1fr); } }
+  @media (max-width:480px){ .grid{ grid-template-columns:1fr; } }
+
+  .card{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:18px;
+    text-align:left;
+    color:var(--paper);
+    display:flex; flex-direction:column; gap:10px;
+    transition:border-color .15s ease, transform .15s ease;
+    min-height:130px;
+  }
+  .card:hover{ border-color:var(--amber); transform:translateY(-2px); }
+  .card .tag{
+    align-self:flex-start;
+    font-family:var(--font-mono); font-size:10px; letter-spacing:0.08em; text-transform:uppercase;
+    color:var(--mint); background:rgba(143,217,196,0.1); padding:3px 8px; border-radius:4px;
+  }
+  .card .icon{ font-size:22px; }
+  .card h3{ font-family:var(--font-display); font-size:16px; margin:0; }
+  .card p{ font-size:12.5px; color:var(--paper-dim); margin:0; line-height:1.5; }
+
+  /* ---------- TOOL VIEW ---------- */
+  .tool-panel{ display:none; padding-bottom:80px; }
+  .tool-panel.active{ display:block; }
+  .tool-head{ padding:28px 0 24px; border-bottom:1px solid var(--line); margin-bottom:28px; }
+  .tool-head h2{ font-family:var(--font-display); font-size:26px; margin:12px 0 6px; }
+  .tool-head p{ color:var(--paper-dim); font-size:14px; margin:0; }
+
+  .panel-box{
+    background:var(--panel); border:1px solid var(--line); border-radius:var(--radius);
+    padding:24px; margin-bottom:16px;
+  }
+  .field{ margin-bottom:16px; }
+  .field label{ display:block; font-family:var(--font-mono); font-size:11px; text-transform:uppercase; letter-spacing:0.06em; color:var(--paper-dim); margin-bottom:6px; }
+  .field input[type=text], .field input[type=number], .field input[type=date], .field select, .field textarea{
+    width:100%; background:var(--ink); border:1px solid var(--line); color:var(--paper);
+    font-family:var(--font-mono); font-size:15px; padding:11px 12px; border-radius:6px;
+  }
+  .field textarea{ font-family:var(--font-body); resize:vertical; min-height:70px; }
+  .row{ display:flex; gap:12px; flex-wrap:wrap; }
+  .row .field{ flex:1; min-width:120px; }
+  .btn{
+    background:var(--amber); color:var(--ink); border:none; font-family:var(--font-mono);
+    font-weight:600; font-size:14px; padding:12px 20px; border-radius:6px;
+  }
+  .btn.secondary{ background:transparent; color:var(--paper); border:1px solid var(--line); }
+  .btn:hover{ filter:brightness(1.08); }
+  .readout-box{
+    background:var(--ink); border:1px dashed var(--line); border-radius:8px;
+    padding:18px; margin-top:14px; font-family:var(--font-mono);
+  }
+  .readout-box .big{ font-size:30px; color:var(--mint); font-weight:600; }
+  .readout-box .small{ font-size:12px; color:var(--paper-dim); margin-top:4px; }
+  .hint{ font-size:12px; color:var(--paper-dim); margin-top:10px; line-height:1.6; }
+
+  /* calculator */
+  .calc-display{
+    background:var(--ink); border:1px solid var(--line); border-radius:8px;
+    padding:20px; text-align:right; font-family:var(--font-mono); margin-bottom:14px;
+  }
+  .calc-display .prev{ font-size:13px; color:var(--paper-dim); min-height:16px; }
+  .calc-display .curr{ font-size:32px; color:var(--paper); word-break:break-all; }
+  .calc-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:8px; }
+  .calc-grid button{
+    background:var(--panel-2); border:1px solid var(--line); color:var(--paper);
+    font-family:var(--font-mono); font-size:17px; padding:16px 0; border-radius:6px;
+  }
+  .calc-grid button.op{ background:var(--amber-soft); color:var(--amber); }
+  .calc-grid button.eq{ background:var(--amber); color:var(--ink); font-weight:600; }
+  .calc-grid button.zero{ grid-column:span 2; }
+  .calc-grid button:hover{ filter:brightness(1.15); }
+
+  /* notes */
+  .note-list{ display:flex; flex-direction:column; gap:10px; margin-top:16px; }
+  .note-item{
+    background:var(--ink); border:1px solid var(--line); border-radius:8px; padding:12px 14px;
+    display:flex; justify-content:space-between; gap:10px; align-items:flex-start;
+  }
+  .note-item .txt{ font-size:14px; line-height:1.5; white-space:pre-wrap; }
+  .note-item .del{ background:none; border:none; color:var(--danger); font-family:var(--font-mono); font-size:12px; flex-shrink:0; }
+
+  /* timer */
+  .timer-display{ font-family:var(--font-mono); font-size:56px; text-align:center; color:var(--mint); margin:20px 0; }
+  .timer-controls{ display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
+
+  /* qr */
+  #qrcode{ display:flex; justify-content:center; margin-top:16px; padding:16px; background:#fff; border-radius:8px; width:fit-content; margin-left:auto; margin-right:auto; }
+
+  footer{ text-align:center; padding:24px 0 60px; color:var(--paper-dim); font-family:var(--font-mono); font-size:11px; letter-spacing:0.05em; }
+</style>
+</head>
+<body>
+
+<!-- ============ LANDING ============ -->
+<section id="view-landing" class="view active">
+  <div class="hero">
+    <span class="corner tl"></span><span class="corner tr"></span>
+    <span class="corner bl"></span><span class="corner br"></span>
+    <div class="hero-inner">
+      <div class="eyebrow" style="justify-content:center;">TOOLKIT — 개인용 유틸리티 모음</div>
+      <h1>필요한 도구를,<br>딱 <span>필요한 만큼.</span></h1>
+      <p>계산기부터 단위 변환, 환율, 메모, QR 코드까지.<br>설치도 회원가입도 없이 브라우저에서 바로 씁니다.</p>
+      <button class="cta" onclick="showView('hub')">시작하기 →</button>
+      <div class="readout-strip">
+        <div class="readout"><div class="n">9</div><div class="l">도구</div></div>
+        <div class="readout"><div class="n">0₩</div><div class="l">비용</div></div>
+        <div class="readout"><div class="n">100%</div><div class="l">브라우저 실행</div></div>
+      </div>
+      <div class="hero-foot">NO SERVER · NO SIGNUP · NO COST</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ HUB ============ -->
+<section id="view-hub" class="view">
+  <div class="wrap">
+    <div class="topbar">
+      <div class="brand"><span class="dot"></span>TOOLKIT</div>
+      <input class="search" id="searchInput" type="text" placeholder="도구 검색..." oninput="filterCards()">
+    </div>
+    <div class="hub-head">
+      <div class="eyebrow">전체 도구</div>
+      <h2>오늘은 뭘 계산해볼까요</h2>
+      <p>카드를 눌러 바로 시작하세요.</p>
+    </div>
+    <div class="grid" id="cardGrid">
+      <!-- cards injected by JS -->
+    </div>
+  </div>
+</section>
+
+<!-- ============ TOOL CONTAINER ============ -->
+<section id="view-tools" class="view">
+  <div class="wrap">
+    <div class="topbar">
+      <button class="back-link" onclick="showView('hub')">← 도구 목록</button>
+      <div class="brand"><span class="dot"></span>TOOLKIT</div>
+    </div>
+
+    <!-- 계산기 -->
+    <div class="tool-panel" id="tool-calc">
+      <div class="tool-head"><div class="eyebrow">계산</div><h2>계산기</h2><p>기본 사칙연산을 빠르게.</p></div>
+      <div class="panel-box">
+        <div class="calc-display">
+          <div class="prev" id="calcPrev">&nbsp;</div>
+          <div class="curr" id="calcCurr">0</div>
+        </div>
+        <div class="calc-grid">
+          <button onclick="calcClear()">C</button>
+          <button onclick="calcSign()">±</button>
+          <button onclick="calcPercent()">%</button>
+          <button class="op" onclick="calcOp('÷')">÷</button>
+          <button onclick="calcNum('7')">7</button>
+          <button onclick="calcNum('8')">8</button>
+          <button onclick="calcNum('9')">9</button>
+          <button class="op" onclick="calcOp('×')">×</button>
+          <button onclick="calcNum('4')">4</button>
+          <button onclick="calcNum('5')">5</button>
+          <button onclick="calcNum('6')">6</button>
+          <button class="op" onclick="calcOp('−')">−</button>
+          <button onclick="calcNum('1')">1</button>
+          <button onclick="calcNum('2')">2</button>
+          <button onclick="calcNum('3')">3</button>
+          <button class="op" onclick="calcOp('+')">+</button>
+          <button class="zero" onclick="calcNum('0')">0</button>
+          <button onclick="calcDot()">.</button>
+          <button class="eq" onclick="calcEquals()">=</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 단위 변환기 -->
+    <div class="tool-panel" id="tool-unit">
+      <div class="tool-head"><div class="eyebrow">변환</div><h2>단위 변환기</h2><p>길이, 무게, 온도를 서로 변환합니다.</p></div>
+      <div class="panel-box">
+        <div class="field">
+          <label>종류</label>
+          <select id="unitCategory" onchange="renderUnitOptions()">
+            <option value="length">길이</option>
+            <option value="weight">무게</option>
+            <option value="temp">온도</option>
+          </select>
+        </div>
+        <div class="row">
+          <div class="field">
+            <label>값</label>
+            <input type="number" id="unitValue" value="1" oninput="calcUnit()">
+          </div>
+          <div class="field">
+            <label>From</label>
+            <select id="unitFrom" onchange="calcUnit()"></select>
+          </div>
+          <div class="field">
+            <label>To</label>
+            <select id="unitTo" onchange="calcUnit()"></select>
+          </div>
+        </div>
+        <div class="readout-box">
+          <div class="big" id="unitResult">—</div>
+          <div class="small" id="unitFormula">&nbsp;</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BMI -->
+    <div class="tool-panel" id="tool-bmi">
+      <div class="tool-head"><div class="eyebrow">계산</div><h2>BMI 계산기</h2><p>체질량지수를 계산합니다. 참고용이며 의학적 진단이 아닙니다.</p></div>
+      <div class="panel-box">
+        <div class="row">
+          <div class="field"><label>키 (cm)</label><input type="number" id="bmiHeight" placeholder="170" oninput="calcBmi()"></div>
+          <div class="field"><label>몸무게 (kg)</label><input type="number" id="bmiWeight" placeholder="65" oninput="calcBmi()"></div>
+        </div>
+        <div class="readout-box">
+          <div class="big" id="bmiResult">—</div>
+          <div class="small" id="bmiCategory">&nbsp;</div>
+        </div>
+        <div class="hint">WHO 기준 · 저체중 &lt;18.5 · 정상 18.5–22.9 · 과체중 23–24.9 · 비만 ≥25 (아시아 기준)</div>
+      </div>
+    </div>
+
+    <!-- 팁/영수증 분할 계산기 -->
+    <div class="tool-panel" id="tool-tip">
+      <div class="tool-head"><div class="eyebrow">계산</div><h2>영수증 분할 계산기</h2><p>팁 포함 금액을 인원수대로 나눕니다.</p></div>
+      <div class="panel-box">
+        <div class="row">
+          <div class="field"><label>총 금액 (₩)</label><input type="number" id="tipAmount" placeholder="50000" oninput="calcTip()"></div>
+          <div class="field"><label>팁 비율 (%)</label><input type="number" id="tipPercent" placeholder="10" value="10" oninput="calcTip()"></div>
+          <div class="field"><label>인원 수</label><input type="number" id="tipPeople" placeholder="1" value="1" oninput="calcTip()"></div>
+        </div>
+        <div class="readout-box">
+          <div class="big" id="tipResult">—</div>
+          <div class="small" id="tipSub">&nbsp;</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 디데이 계산기 -->
+    <div class="tool-panel" id="tool-dday">
+      <div class="tool-head"><div class="eyebrow">계산</div><h2>디데이 계산기</h2><p>오늘부터 특정 날짜까지 남은 일수를 계산합니다.</p></div>
+      <div class="panel-box">
+        <div class="field"><label>날짜 선택</label><input type="date" id="ddayInput" oninput="calcDday()"></div>
+        <div class="readout-box">
+          <div class="big" id="ddayResult">—</div>
+          <div class="small" id="ddaySub">&nbsp;</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 환율 변환기 -->
+    <div class="tool-panel" id="tool-fx">
+      <div class="tool-head"><div class="eyebrow">변환</div><h2>환율 변환기</h2><p>실시간 환율로 통화를 변환합니다 (frankfurter.app API).</p></div>
+      <div class="panel-box">
+        <div class="row">
+          <div class="field"><label>금액</label><input type="number" id="fxAmount" value="100" ></div>
+          <div class="field"><label>From</label>
+            <select id="fxFrom">
+              <option value="USD">USD 미국 달러</option>
+              <option value="KRW" selected>KRW 원</option>
+              <option value="EUR">EUR 유로</option>
+              <option value="JPY">JPY 엔</option>
+              <option value="GBP">GBP 파운드</option>
+              <option value="CNY">CNY 위안</option>
+            </select>
+          </div>
+          <div class="field"><label>To</label>
+            <select id="fxTo">
+              <option value="USD" selected>USD 미국 달러</option>
+              <option value="KRW">KRW 원</option>
+              <option value="EUR">EUR 유로</option>
+              <option value="JPY">JPY 엔</option>
+              <option value="GBP">GBP 파운드</option>
+              <option value="CNY">CNY 위안</option>
+            </select>
+          </div>
+        </div>
+        <button class="btn" onclick="calcFx()">변환하기</button>
+        <div class="readout-box">
+          <div class="big" id="fxResult">—</div>
+          <div class="small" id="fxSub">&nbsp;</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 메모장 -->
+    <div class="tool-panel" id="tool-notes">
+      <div class="tool-head"><div class="eyebrow">생산성</div><h2>메모장</h2><p>이 브라우저에만 저장됩니다 (다른 기기와 동기화되지 않음).</p></div>
+      <div class="panel-box">
+        <div class="field">
+          <textarea id="noteInput" placeholder="메모를 입력하세요..."></textarea>
+        </div>
+        <button class="btn" onclick="addNote()">메모 추가</button>
+        <div class="note-list" id="noteList"></div>
+      </div>
+    </div>
+
+    <!-- 타이머 -->
+    <div class="tool-panel" id="tool-timer">
+      <div class="tool-head"><div class="eyebrow">생산성</div><h2>타이머</h2><p>분/초를 입력하고 카운트다운을 시작하세요.</p></div>
+      <div class="panel-box">
+        <div class="row">
+          <div class="field"><label>분</label><input type="number" id="timerMin" value="5"></div>
+          <div class="field"><label>초</label><input type="number" id="timerSec" value="0"></div>
+        </div>
+        <div class="timer-display" id="timerDisplay">05:00</div>
+        <div class="timer-controls">
+          <button class="btn" id="timerStart" onclick="timerStart()">시작</button>
+          <button class="btn secondary" onclick="timerPause()">일시정지</button>
+          <button class="btn secondary" onclick="timerReset()">초기화</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- QR 코드 -->
+    <div class="tool-panel" id="tool-qr">
+      <div class="tool-head"><div class="eyebrow">생산성</div><h2>QR 코드 생성기</h2><p>URL이나 텍스트를 QR 코드로 변환합니다.</p></div>
+      <div class="panel-box">
+        <div class="field"><label>URL 또는 텍스트</label><input type="text" id="qrInput" placeholder="https://example.com" oninput="genQr()"></div>
+        <div id="qrcode"></div>
+        <div style="text-align:center; margin-top:14px;">
+          <button class="btn secondary" onclick="downloadQr()">이미지로 저장</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<footer>TOOLKIT · 브라우저에서 실행되며 서버로 데이터를 전송하지 않습니다 (환율/QR 제외)</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+/* ============ NAVIGATION ============ */
+const TOOLS = [
+  { id:'calc',  tag:'계산',   icon:'🧮', title:'계산기',            desc:'기본 사칙연산 계산기' },
+  { id:'unit',  tag:'변환',   icon:'📐', title:'단위 변환기',        desc:'길이·무게·온도 변환' },
+  { id:'bmi',   tag:'계산',   icon:'⚖️', title:'BMI 계산기',        desc:'체질량지수 계산' },
+  { id:'tip',   tag:'계산',   icon:'🧾', title:'영수증 분할 계산기', desc:'팁 포함 더치페이 계산' },
+  { id:'dday',  tag:'계산',   icon:'📅', title:'디데이 계산기',      desc:'목표일까지 남은 일수' },
+  { id:'fx',    tag:'변환',   icon:'💱', title:'환율 변환기',        desc:'실시간 통화 변환' },
+  { id:'notes', tag:'생산성', icon:'📝', title:'메모장',            desc:'간단한 브라우저 메모' },
+  { id:'timer', tag:'생산성', icon:'⏱️', title:'타이머',            desc:'카운트다운 타이머' },
+  { id:'qr',    tag:'생산성', icon:'🔳', title:'QR 코드 생성기',     desc:'텍스트/URL을 QR로 변환' },
+];
+
+function renderCards(filter=''){
+  const grid = document.getElementById('cardGrid');
+  grid.innerHTML = '';
+  TOOLS.filter(t => (t.title+t.desc).toLowerCase().includes(filter.toLowerCase())).forEach(t=>{
+    const card = document.createElement('button');
+    card.className = 'card';
+    card.onclick = () => openTool(t.id);
+    card.innerHTML = `<span class="tag">${t.tag}</span><span class="icon">${t.icon}</span><h3>${t.title}</h3><p>${t.desc}</p>`;
+    grid.appendChild(card);
+  });
+}
+function filterCards(){ renderCards(document.getElementById('searchInput').value); }
+renderCards();
+
+function showView(name){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.getElementById('view-'+name).classList.add('active');
+  window.scrollTo(0,0);
+}
+function openTool(id){
+  showView('tools');
+  document.querySelectorAll('.tool-panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('tool-'+id).classList.add('active');
+  if(id==='unit') renderUnitOptions();
+  if(id==='notes') renderNotes();
+}
+
+/* ============ 계산기 ============ */
+let calcCurrent = '0', calcPrevious = '', calcOperator = null, calcReset = false;
+function updateCalcDisplay(){
+  document.getElementById('calcCurr').textContent = calcCurrent;
+  document.getElementById('calcPrev').textContent = calcPrevious ? `${calcPrevious} ${calcOperator||''}` : '\u00A0';
+}
+function calcNum(n){
+  if(calcReset){ calcCurrent = n; calcReset=false; }
+  else calcCurrent = calcCurrent==='0' ? n : calcCurrent+n;
+  updateCalcDisplay();
+}
+function calcDot(){
+  if(calcReset){ calcCurrent='0.'; calcReset=false; updateCalcDisplay(); return; }
+  if(!calcCurrent.includes('.')) calcCurrent += '.';
+  updateCalcDisplay();
+}
+function calcClear(){ calcCurrent='0'; calcPrevious=''; calcOperator=null; updateCalcDisplay(); }
+function calcSign(){ calcCurrent = (parseFloat(calcCurrent)*-1).toString(); updateCalcDisplay(); }
+function calcPercent(){ calcCurrent = (parseFloat(calcCurrent)/100).toString(); updateCalcDisplay(); }
+function calcOp(op){
+  if(calcOperator && !calcReset) calcEquals();
+  calcPrevious = calcCurrent;
+  calcOperator = op;
+  calcReset = true;
+}
+function calcEquals(){
+  if(!calcOperator) return;
+  const a = parseFloat(calcPrevious), b = parseFloat(calcCurrent);
+  let r;
+  switch(calcOperator){
+    case '+': r=a+b; break;
+    case '−': r=a-b; break;
+    case '×': r=a*b; break;
+    case '÷': r=b===0 ? NaN : a/b; break;
+  }
+  calcCurrent = Number.isNaN(r) ? '0으로 나눌 수 없음' : (Math.round(r*1e8)/1e8).toString();
+  calcOperator = null; calcPrevious=''; calcReset = true;
+  updateCalcDisplay();
+}
+
+/* ============ 단위 변환기 ============ */
+const UNIT_DEFS = {
+  length: { unit:['mm','cm','m','km','in','ft','mile'],
+    factor:{mm:0.001, cm:0.01, m:1, km:1000, in:0.0254, ft:0.3048, mile:1609.344} },
+  weight: { unit:['mg','g','kg','t','oz','lb'],
+    factor:{mg:0.000001, g:0.001, kg:1, t:1000, oz:0.0283495, lb:0.453592} },
+  temp: { unit:['°C','°F','K'] }
+};
+function renderUnitOptions(){
+  const cat = document.getElementById('unitCategory').value;
+  const from = document.getElementById('unitFrom'), to = document.getElementById('unitTo');
+  from.innerHTML=''; to.innerHTML='';
+  UNIT_DEFS[cat].unit.forEach((u,i)=>{
+    from.innerHTML += `<option value="${u}">${u}</option>`;
+    to.innerHTML += `<option value="${u}">${u}</option>`;
+  });
+  to.selectedIndex = Math.min(1, UNIT_DEFS[cat].unit.length-1);
+  calcUnit();
+}
+function tempToC(v,u){ if(u==='°C') return v; if(u==='°F') return (v-32)*5/9; if(u==='K') return v-273.15; }
+function cToTemp(c,u){ if(u==='°C') return c; if(u==='°F') return c*9/5+32; if(u==='K') return c+273.15; }
+function calcUnit(){
+  const cat = document.getElementById('unitCategory').value;
+  const val = parseFloat(document.getElementById('unitValue').value);
+  const from = document.getElementById('unitFrom').value, to = document.getElementById('unitTo').value;
+  if(Number.isNaN(val)){ document.getElementById('unitResult').textContent='—'; return; }
+  let result;
+  if(cat==='temp'){ result = cToTemp(tempToC(val, from), to); }
+  else { const f = UNIT_DEFS[cat].factor; result = val * f[from] / f[to]; }
+  document.getElementById('unitResult').textContent = `${(Math.round(result*10000)/10000)} ${to}`;
+  document.getElementById('unitFormula').textContent = `${val} ${from} = ${(Math.round(result*10000)/10000)} ${to}`;
+}
+
+/* ============ BMI ============ */
+function calcBmi(){
+  const h = parseFloat(document.getElementById('bmiHeight').value)/100;
+  const w = parseFloat(document.getElementById('bmiWeight').value);
+  if(!h || !w){ document.getElementById('bmiResult').textContent='—'; return; }
+  const bmi = w/(h*h);
+  let cat='';
+  if(bmi<18.5) cat='저체중';
+  else if(bmi<23) cat='정상';
+  else if(bmi<25) cat='과체중';
+  else cat='비만';
+  document.getElementById('bmiResult').textContent = bmi.toFixed(1);
+  document.getElementById('bmiCategory').textContent = `분류: ${cat}`;
+}
+
+/* ============ 영수증 분할 ============ */
+function calcTip(){
+  const amt = parseFloat(document.getElementById('tipAmount').value)||0;
+  const pct = parseFloat(document.getElementById('tipPercent').value)||0;
+  const people = parseFloat(document.getElementById('tipPeople').value)||1;
+  const total = amt * (1+pct/100);
+  const per = total/people;
+  document.getElementById('tipResult').textContent = `₩${Math.round(per).toLocaleString()} / 인`;
+  document.getElementById('tipSub').textContent = `총 ${Math.round(total).toLocaleString()}원 (팁 ${Math.round(amt*pct/100).toLocaleString()}원 포함) ÷ ${people}명`;
+}
+
+/* ============ 디데이 ============ */
+function calcDday(){
+  const val = document.getElementById('ddayInput').value;
+  if(!val) return;
+  const target = new Date(val+'T00:00:00');
+  const today = new Date(); today.setHours(0,0,0,0);
+  const diff = Math.round((target-today)/86400000);
+  document.getElementById('ddayResult').textContent = diff===0 ? 'D-Day' : (diff>0 ? `D-${diff}` : `D+${Math.abs(diff)}`);
+  document.getElementById('ddaySub').textContent = diff>=0 ? `${diff}일 남았습니다` : `${Math.abs(diff)}일 지났습니다`;
+}
+
+/* ============ 환율 ============ */
+async function calcFx(){
+  const amt = parseFloat(document.getElementById('fxAmount').value)||0;
+  const from = document.getElementById('fxFrom').value, to = document.getElementById('fxTo').value;
+  document.getElementById('fxResult').textContent = '조회 중...';
+  document.getElementById('fxSub').textContent = '\u00A0';
+  try{
+    const res = await fetch(`https://api.frankfurter.app/latest?amount=${amt}&from=${from}&to=${to}`);
+    const data = await res.json();
+    const value = data.rates[to];
+    document.getElementById('fxResult').textContent = `${value.toLocaleString(undefined,{maximumFractionDigits:2})} ${to}`;
+    document.getElementById('fxSub').textContent = `${amt} ${from} 기준 · ${data.date} 환율`;
+  }catch(e){
+    document.getElementById('fxResult').textContent = '조회 실패';
+    document.getElementById('fxSub').textContent = '네트워크 연결을 확인해주세요';
+  }
+}
+
+/* ============ 메모장 ============ */
+function getNotes(){ return JSON.parse(localStorage.getItem('toolkit_notes')||'[]'); }
+function setNotes(n){ localStorage.setItem('toolkit_notes', JSON.stringify(n)); }
+function renderNotes(){
+  const list = getNotes();
+  const el = document.getElementById('noteList');
+  el.innerHTML = list.length ? '' : '<div class="hint">아직 메모가 없습니다.</div>';
+  list.forEach((n,i)=>{
+    const div = document.createElement('div');
+    div.className = 'note-item';
+    div.innerHTML = `<div class="txt"></div><button class="del">삭제</button>`;
+    div.querySelector('.txt').textContent = n;
+    div.querySelector('.del').onclick = ()=>{ const l=getNotes(); l.splice(i,1); setNotes(l); renderNotes(); };
+    el.appendChild(div);
+  });
+}
+function addNote(){
+  const input = document.getElementById('noteInput');
+  if(!input.value.trim()) return;
+  const list = getNotes();
+  list.unshift(input.value.trim());
+  setNotes(list);
+  input.value='';
+  renderNotes();
+}
+
+/* ============ 타이머 ============ */
+let timerInterval=null, timerRemaining=300;
+function timerFormat(s){ const m=Math.floor(s/60), sec=s%60; return `${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`; }
+function timerStart(){
+  if(timerInterval) return;
+  if(timerRemaining<=0){
+    timerRemaining = (parseInt(document.getElementById('timerMin').value)||0)*60 + (parseInt(document.getElementById('timerSec').value)||0);
+  }
+  timerInterval = setInterval(()=>{
+    timerRemaining--;
+    document.getElementById('timerDisplay').textContent = timerFormat(Math.max(timerRemaining,0));
+    if(timerRemaining<=0){
+      clearInterval(timerInterval); timerInterval=null;
+      document.getElementById('timerDisplay').textContent = '00:00';
+      alert('타이머가 끝났습니다!');
+    }
+  },1000);
+}
+function timerPause(){ clearInterval(timerInterval); timerInterval=null; }
+function timerReset(){
+  clearInterval(timerInterval); timerInterval=null;
+  timerRemaining = (parseInt(document.getElementById('timerMin').value)||0)*60 + (parseInt(document.getElementById('timerSec').value)||0);
+  document.getElementById('timerDisplay').textContent = timerFormat(timerRemaining);
+}
+document.addEventListener('DOMContentLoaded', timerReset);
+
+/* ============ QR 코드 ============ */
+let qrObj = null;
+function genQr(){
+  const val = document.getElementById('qrInput').value.trim();
+  const container = document.getElementById('qrcode');
+  container.innerHTML = '';
+  if(!val) return;
+  qrObj = new QRCode(container, { text: val, width:200, height:200, colorDark:'#0D2B3E', colorLight:'#ffffff' });
+}
+function downloadQr(){
+  const canvas = document.querySelector('#qrcode canvas');
+  if(!canvas){ alert('먼저 QR 코드를 생성해주세요.'); return; }
+  const link = document.createElement('a');
+  link.download = 'qrcode.png';
+  link.href = canvas.toDataURL();
+  link.click();
+}
+</script>
+</body>
+</html>
