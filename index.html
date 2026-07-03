@@ -35,13 +35,50 @@
     font-family:var(--font-body);
     min-height:100vh;
     -webkit-font-smoothing:antialiased;
+    -webkit-user-select:none; -moz-user-select:none; -ms-user-select:none; user-select:none;
+    -webkit-touch-callout:none;
   }
+  input, textarea, select{
+    -webkit-user-select:text; -moz-user-select:text; -ms-user-select:text; user-select:text;
+    -webkit-touch-callout:default;
+  }
+  img{ -webkit-user-drag:none; user-drag:none; }
   a{ color:inherit; }
-  button{ font-family:inherit; cursor:pointer; }
+  button{ font-family:inherit; cursor:pointer; transition:transform .12s ease; }
+  button:active{ transform:scale(0.96); }
   :focus-visible{ outline:2px solid var(--amber); outline-offset:2px; }
 
+  /* ---------- copy button ---------- */
+  .copy-btn{
+    position:absolute; top:10px; right:10px;
+    width:28px; height:28px; padding:0;
+    display:flex; align-items:center; justify-content:center;
+    background:var(--panel-2); border:1px solid var(--line); border-radius:6px;
+    color:var(--paper-dim);
+  }
+  .copy-btn:hover{ border-color:var(--amber); color:var(--amber); }
+  .copy-btn.copied{ border-color:var(--mint); color:var(--mint); }
+  .copy-btn svg{ width:14px; height:14px; }
+  .readout-box.has-copy{ position:relative; padding-right:52px; }
+  .copy-inline{
+    display:inline-flex; align-items:center; gap:6px; margin-top:10px;
+    background:transparent; border:1px solid var(--line); color:var(--paper-dim);
+    font-family:var(--font-mono); font-size:12px; padding:8px 12px; border-radius:6px;
+  }
+  .copy-inline:hover{ border-color:var(--amber); color:var(--amber); }
+  .copy-inline svg{ width:13px; height:13px; }
+
+  /* ---------- animation ---------- */
+  @keyframes fadeUp{ from{ opacity:0; transform:translateY(14px); } to{ opacity:1; transform:translateY(0); } }
+  @keyframes fadeIn{ from{ opacity:0; } to{ opacity:1; } }
+  @keyframes popResult{ 0%{ transform:scale(1); } 35%{ transform:scale(1.05); color:var(--amber); } 100%{ transform:scale(1); } }
+  @media (prefers-reduced-motion: reduce){
+    *{ animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.001ms !important; }
+  }
+
   .view{ display:none; }
-  .view.active{ display:block; }
+  .view.active{ display:block; animation:fadeIn .35s ease both; }
+  .pop{ animation:popResult .4s ease; }
 
   /* ---------- shared ---------- */
   .wrap{ max-width:960px; margin:0 auto; padding:0 24px; }
@@ -75,6 +112,13 @@
   .corner.br{ bottom:24px; right:24px; transform:scale(-1,-1); }
 
   .hero-inner{ max-width:640px; margin:0 auto; text-align:center; }
+  .hero-inner > *{ animation:fadeUp .7s cubic-bezier(.2,.7,.3,1) both; }
+  .hero-inner > .eyebrow{ animation-delay:.05s; justify-content:center; }
+  .hero-inner > h1{ animation-delay:.15s; }
+  .hero-inner > p{ animation-delay:.28s; }
+  .hero-inner > .cta{ animation-delay:.4s; }
+  .hero-inner > .readout-strip{ animation-delay:.52s; }
+  .hero-inner > .hero-foot{ animation-delay:.62s; }
   .hero h1{
     font-family:var(--font-display);
     font-weight:700;
@@ -163,22 +207,26 @@
     text-align:left;
     color:var(--paper);
     display:flex; flex-direction:column; gap:10px;
-    transition:border-color .15s ease, transform .15s ease;
+    transition:border-color .18s ease, transform .18s ease, box-shadow .18s ease;
     min-height:130px;
+    opacity:0;
+    animation:fadeUp .45s cubic-bezier(.2,.7,.3,1) both;
   }
-  .card:hover{ border-color:var(--amber); transform:translateY(-2px); }
+  .card:hover{ border-color:var(--amber); transform:translateY(-3px); box-shadow:0 10px 24px rgba(0,0,0,0.22); }
+  .card:hover .icon svg{ transform:scale(1.1) rotate(-3deg); stroke:var(--amber); }
   .card .tag{
     align-self:flex-start;
     font-family:var(--font-mono); font-size:10px; letter-spacing:0.08em; text-transform:uppercase;
     color:var(--mint); background:rgba(143,217,196,0.1); padding:3px 8px; border-radius:4px;
   }
-  .card .icon{ font-size:22px; }
+  .card .icon{ line-height:0; }
+  .card .icon svg{ width:22px; height:22px; stroke:var(--mint); transition:transform .25s ease, stroke .2s ease; }
   .card h3{ font-family:var(--font-display); font-size:16px; margin:0; }
   .card p{ font-size:12.5px; color:var(--paper-dim); margin:0; line-height:1.5; }
 
   /* ---------- TOOL VIEW ---------- */
   .tool-panel{ display:none; padding-bottom:80px; }
-  .tool-panel.active{ display:block; }
+  .tool-panel.active{ display:block; animation:fadeUp .35s cubic-bezier(.2,.7,.3,1) both; }
   .tool-head{ padding:28px 0 24px; border-bottom:1px solid var(--line); margin-bottom:28px; }
   .tool-head h2{ font-family:var(--font-display); font-size:26px; margin:12px 0 6px; }
   .tool-head p{ color:var(--paper-dim); font-size:14px; margin:0; }
@@ -201,12 +249,13 @@
     font-weight:600; font-size:14px; padding:12px 20px; border-radius:6px;
   }
   .btn.secondary{ background:transparent; color:var(--paper); border:1px solid var(--line); }
-  .btn:hover{ filter:brightness(1.08); }
+  .btn:hover{ filter:brightness(1.08); transform:translateY(-1px); }
   .readout-box{
     background:var(--ink); border:1px dashed var(--line); border-radius:8px;
     padding:18px; margin-top:14px; font-family:var(--font-mono);
+    transition:border-color .2s ease;
   }
-  .readout-box .big{ font-size:30px; color:var(--mint); font-weight:600; }
+  .readout-box .big{ font-size:30px; color:var(--mint); font-weight:600; display:inline-block; }
   .readout-box .small{ font-size:12px; color:var(--paper-dim); margin-top:4px; }
   .hint{ font-size:12px; color:var(--paper-dim); margin-top:10px; line-height:1.6; }
 
@@ -214,6 +263,7 @@
   .calc-display{
     background:var(--ink); border:1px solid var(--line); border-radius:8px;
     padding:20px; text-align:right; font-family:var(--font-mono); margin-bottom:14px;
+    position:relative;
   }
   .calc-display .prev{ font-size:13px; color:var(--paper-dim); min-height:16px; }
   .calc-display .curr{ font-size:32px; color:var(--paper); word-break:break-all; }
@@ -226,12 +276,14 @@
   .calc-grid button.eq{ background:var(--amber); color:var(--ink); font-weight:600; }
   .calc-grid button.zero{ grid-column:span 2; }
   .calc-grid button:hover{ filter:brightness(1.15); }
+  .calc-grid button:active{ transform:scale(0.92); }
 
   /* notes */
   .note-list{ display:flex; flex-direction:column; gap:10px; margin-top:16px; }
   .note-item{
     background:var(--ink); border:1px solid var(--line); border-radius:8px; padding:12px 14px;
     display:flex; justify-content:space-between; gap:10px; align-items:flex-start;
+    animation:fadeUp .3s ease both;
   }
   .note-item .txt{ font-size:14px; line-height:1.5; white-space:pre-wrap; }
   .note-item .del{ background:none; border:none; color:var(--danger); font-family:var(--font-mono); font-size:12px; flex-shrink:0; }
@@ -242,6 +294,24 @@
 
   /* qr */
   #qrcode{ display:flex; justify-content:center; margin-top:16px; padding:16px; background:#fff; border-radius:8px; width:fit-content; margin-left:auto; margin-right:auto; }
+
+  /* typing game */
+  .typing-target{
+    font-family:var(--font-mono); font-size:19px; line-height:1.9;
+    background:var(--ink); border:1px dashed var(--line); border-radius:8px;
+    padding:20px; margin:16px 0; letter-spacing:0.02em; word-break:keep-all;
+    user-select:none;
+  }
+  .typing-target .correct{ color:var(--mint); }
+  .typing-target .incorrect{ color:var(--danger); text-decoration:underline; text-underline-offset:3px; }
+  .typing-target .pending{ color:var(--paper-dim); }
+  .typing-target .current{ border-bottom:2px solid var(--amber); animation:blinkCursor 1s step-end infinite; }
+  @keyframes blinkCursor{ 50%{ border-color:transparent; } }
+  .typing-input{
+    width:100%; background:var(--ink); border:1px solid var(--line); color:var(--paper);
+    font-family:var(--font-mono); font-size:16px; padding:12px 14px; border-radius:6px;
+  }
+  .typing-input:disabled{ opacity:0.5; }
 
   footer{ text-align:center; padding:24px 0 60px; color:var(--paper-dim); font-family:var(--font-mono); font-size:11px; letter-spacing:0.05em; }
 </style>
@@ -256,10 +326,10 @@
     <div class="hero-inner">
       <div class="eyebrow" style="justify-content:center;">TOOLKIT — 개인용 유틸리티 모음</div>
       <h1>필요한 도구를,<br>딱 <span>필요한 만큼.</span></h1>
-      <p>계산기부터 단위 변환, 환율, 메모, QR 코드까지.<br>설치도 회원가입도 없이 브라우저에서 바로 씁니다.</p>
+      <p>계산기부터 단위 변환, 메모, QR 코드, 타자 게임까지.<br>설치도 회원가입도 없이 브라우저에서 바로 씁니다.</p>
       <button class="cta" onclick="showView('hub')">시작하기 →</button>
       <div class="readout-strip">
-        <div class="readout"><div class="n">9</div><div class="l">도구</div></div>
+        <div class="readout"><div class="n">13</div><div class="l">도구</div></div>
         <div class="readout"><div class="n">0₩</div><div class="l">비용</div></div>
         <div class="readout"><div class="n">100%</div><div class="l">브라우저 실행</div></div>
       </div>
@@ -299,6 +369,7 @@
       <div class="tool-head"><div class="eyebrow">계산</div><h2>계산기</h2><p>기본 사칙연산을 빠르게.</p></div>
       <div class="panel-box">
         <div class="calc-display">
+          <button class="copy-btn" data-copy="calcCurr" aria-label="결과 복사"></button>
           <div class="prev" id="calcPrev">&nbsp;</div>
           <div class="curr" id="calcCurr">0</div>
         </div>
@@ -352,7 +423,8 @@
             <select id="unitTo" onchange="calcUnit()"></select>
           </div>
         </div>
-        <div class="readout-box">
+        <div class="readout-box has-copy">
+          <button class="copy-btn" data-copy="unitResult" aria-label="결과 복사"></button>
           <div class="big" id="unitResult">—</div>
           <div class="small" id="unitFormula">&nbsp;</div>
         </div>
@@ -367,7 +439,8 @@
           <div class="field"><label>키 (cm)</label><input type="number" id="bmiHeight" placeholder="170" oninput="calcBmi()"></div>
           <div class="field"><label>몸무게 (kg)</label><input type="number" id="bmiWeight" placeholder="65" oninput="calcBmi()"></div>
         </div>
-        <div class="readout-box">
+        <div class="readout-box has-copy">
+          <button class="copy-btn" data-copy="bmiResult" aria-label="결과 복사"></button>
           <div class="big" id="bmiResult">—</div>
           <div class="small" id="bmiCategory">&nbsp;</div>
         </div>
@@ -384,7 +457,8 @@
           <div class="field"><label>팁 비율 (%)</label><input type="number" id="tipPercent" placeholder="10" value="10" oninput="calcTip()"></div>
           <div class="field"><label>인원 수</label><input type="number" id="tipPeople" placeholder="1" value="1" oninput="calcTip()"></div>
         </div>
-        <div class="readout-box">
+        <div class="readout-box has-copy">
+          <button class="copy-btn" data-copy="tipResult" aria-label="결과 복사"></button>
           <div class="big" id="tipResult">—</div>
           <div class="small" id="tipSub">&nbsp;</div>
         </div>
@@ -396,45 +470,29 @@
       <div class="tool-head"><div class="eyebrow">계산</div><h2>디데이 계산기</h2><p>오늘부터 특정 날짜까지 남은 일수를 계산합니다.</p></div>
       <div class="panel-box">
         <div class="field"><label>날짜 선택</label><input type="date" id="ddayInput" oninput="calcDday()"></div>
-        <div class="readout-box">
+        <div class="readout-box has-copy">
+          <button class="copy-btn" data-copy="ddayResult" aria-label="결과 복사"></button>
           <div class="big" id="ddayResult">—</div>
           <div class="small" id="ddaySub">&nbsp;</div>
         </div>
       </div>
     </div>
 
-    <!-- 환율 변환기 -->
-    <div class="tool-panel" id="tool-fx">
-      <div class="tool-head"><div class="eyebrow">변환</div><h2>환율 변환기</h2><p>실시간 환율로 통화를 변환합니다 (frankfurter.app API).</p></div>
+    <!-- 타자 게임 -->
+    <div class="tool-panel" id="tool-typing">
+      <div class="tool-head"><div class="eyebrow">게임</div><h2>타자 연습</h2><p>주어진 문장을 빠르고 정확하게 입력해보세요.</p></div>
       <div class="panel-box">
         <div class="row">
-          <div class="field"><label>금액</label><input type="number" id="fxAmount" value="100" ></div>
-          <div class="field"><label>From</label>
-            <select id="fxFrom">
-              <option value="USD">USD 미국 달러</option>
-              <option value="KRW" selected>KRW 원</option>
-              <option value="EUR">EUR 유로</option>
-              <option value="JPY">JPY 엔</option>
-              <option value="GBP">GBP 파운드</option>
-              <option value="CNY">CNY 위안</option>
-            </select>
-          </div>
-          <div class="field"><label>To</label>
-            <select id="fxTo">
-              <option value="USD" selected>USD 미국 달러</option>
-              <option value="KRW">KRW 원</option>
-              <option value="EUR">EUR 유로</option>
-              <option value="JPY">JPY 엔</option>
-              <option value="GBP">GBP 파운드</option>
-              <option value="CNY">CNY 위안</option>
-            </select>
-          </div>
+          <div class="readout-box" style="flex:1;"><div class="big" id="typeTime">0.0s</div><div class="small">경과 시간</div></div>
+          <div class="readout-box" style="flex:1;"><div class="big" id="typeCpm">0</div><div class="small">분당 타수 (CPM)</div></div>
+          <div class="readout-box" style="flex:1;"><div class="big" id="typeAcc">100%</div><div class="small">정확도</div></div>
         </div>
-        <button class="btn" onclick="calcFx()">변환하기</button>
-        <div class="readout-box">
-          <div class="big" id="fxResult">—</div>
-          <div class="small" id="fxSub">&nbsp;</div>
+        <div class="typing-target" id="typingTarget"></div>
+        <input type="text" id="typingInput" class="typing-input" placeholder="여기를 클릭하고 입력을 시작하세요..." autocomplete="off" autocapitalize="off" spellcheck="false" oninput="onTypingInput()">
+        <div class="row" style="margin-top:14px;">
+          <button class="btn secondary" onclick="newTypingRound()">새 문장</button>
         </div>
+        <div class="hint" id="typingResultMsg">&nbsp;</div>
       </div>
     </div>
 
@@ -479,52 +537,182 @@
       </div>
     </div>
 
+    <!-- 대출 이자 계산기 -->
+    <div class="tool-panel" id="tool-loan">
+      <div class="tool-head"><div class="eyebrow">계산</div><h2>대출 이자 계산기</h2><p>원리금균등상환 방식 기준 월 상환액을 계산합니다.</p></div>
+      <div class="panel-box">
+        <div class="row">
+          <div class="field"><label>대출 원금 (₩)</label><input type="number" id="loanAmount" placeholder="10000000" oninput="calcLoan()"></div>
+          <div class="field"><label>연이자율 (%)</label><input type="number" id="loanRate" placeholder="4.5" oninput="calcLoan()"></div>
+          <div class="field"><label>대출 기간 (개월)</label><input type="number" id="loanMonths" placeholder="36" oninput="calcLoan()"></div>
+        </div>
+        <div class="readout-box has-copy">
+          <button class="copy-btn" data-copy="loanResult" aria-label="결과 복사"></button>
+          <div class="big" id="loanResult">—</div>
+          <div class="small" id="loanSub">&nbsp;</div>
+        </div>
+        <div class="hint">원리금균등상환 기준이며 실제 대출 조건과 다를 수 있습니다. 참고용 계산입니다.</div>
+      </div>
+    </div>
+
+    <!-- 글자수 세기 -->
+    <div class="tool-panel" id="tool-counter">
+      <div class="tool-head"><div class="eyebrow">생산성</div><h2>글자수 세기</h2><p>글자, 공백 제외 글자, 단어, 바이트 수를 실시간으로 셉니다.</p></div>
+      <div class="panel-box">
+        <div class="field">
+          <textarea id="counterInput" placeholder="여기에 텍스트를 입력하세요..." style="min-height:140px;" oninput="calcCounter()"></textarea>
+        </div>
+        <div class="row">
+          <div class="readout-box" style="flex:1;"><div class="big" id="countChar">0</div><div class="small">글자 수</div></div>
+          <div class="readout-box" style="flex:1;"><div class="big" id="countCharNoSpace">0</div><div class="small">공백 제외</div></div>
+        </div>
+        <div class="row">
+          <div class="readout-box" style="flex:1;"><div class="big" id="countWord">0</div><div class="small">단어 수</div></div>
+          <div class="readout-box" style="flex:1;"><div class="big" id="countByte">0</div><div class="small">바이트 (UTF-8)</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 랜덤 번호 생성기 -->
+    <div class="tool-panel" id="tool-random">
+      <div class="tool-head"><div class="eyebrow">생산성</div><h2>랜덤 번호 생성기</h2><p>범위 안에서 무작위 숫자를 뽑거나, 목록을 무작위로 섞습니다.</p></div>
+      <div class="panel-box">
+        <div class="row">
+          <div class="field"><label>최소값</label><input type="number" id="randMin" value="1"></div>
+          <div class="field"><label>최대값</label><input type="number" id="randMax" value="100"></div>
+        </div>
+        <button class="btn" onclick="genRandom()">번호 뽑기</button>
+        <div class="readout-box has-copy">
+          <button class="copy-btn" data-copy="randResult" aria-label="결과 복사"></button>
+          <div class="big" id="randResult">—</div>
+        </div>
+      </div>
+      <div class="panel-box">
+        <div class="field">
+          <label>목록 섞기 (쉼표로 구분)</label>
+          <textarea id="shuffleInput" placeholder="예: 철수, 영희, 민수, 지훈" style="min-height:60px;"></textarea>
+        </div>
+        <button class="btn secondary" onclick="genShuffle()">무작위로 섞기</button>
+        <div class="readout-box has-copy">
+          <button class="copy-btn" data-copy="shuffleResult" aria-label="결과 복사"></button>
+          <div class="small" id="shuffleResult">&nbsp;</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Base64 변환기 -->
+    <div class="tool-panel" id="tool-base64">
+      <div class="tool-head"><div class="eyebrow">변환</div><h2>Base64 변환기</h2><p>텍스트를 Base64로 인코딩하거나, Base64를 텍스트로 디코딩합니다.</p></div>
+      <div class="panel-box">
+        <div class="field">
+          <label>입력</label>
+          <textarea id="b64Input" placeholder="텍스트 또는 Base64 문자열을 입력하세요..." style="min-height:100px;"></textarea>
+        </div>
+        <div class="row">
+          <button class="btn" onclick="b64Encode()">인코딩 →</button>
+          <button class="btn secondary" onclick="b64Decode()">← 디코딩</button>
+        </div>
+        <div class="field" style="margin-top:16px;">
+          <label>결과</label>
+          <textarea id="b64Output" placeholder="결과가 여기 표시됩니다" style="min-height:100px;" readonly></textarea>
+        </div>
+        <button class="copy-inline" data-copy="b64Output" aria-label="결과 복사"><span class="copy-label">결과 복사</span></button>
+        <div class="hint" id="b64Hint">&nbsp;</div>
+      </div>
+    </div>
+
   </div>
 </section>
 
-<footer>TOOLKIT · 브라우저에서 실행되며 서버로 데이터를 전송하지 않습니다 (환율/QR 제외)</footer>
+<footer>TOOLKIT · 브라우저에서 실행되며 서버로 데이터를 전송하지 않습니다 (QR 코드 생성 제외)</footer>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script>
 /* ============ NAVIGATION ============ */
+const ICON_ATTRS = 'viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"';
+const ICONS = {
+  calc: `<svg ${ICON_ATTRS}><rect x="5" y="3" width="14" height="18" rx="2"/><line x1="8" y1="7" x2="16" y2="7"/><circle cx="8" cy="12.2" r="0.9"/><circle cx="12" cy="12.2" r="0.9"/><circle cx="16" cy="12.2" r="0.9"/><circle cx="8" cy="16.2" r="0.9"/><circle cx="12" cy="16.2" r="0.9"/><circle cx="16" cy="16.2" r="0.9"/></svg>`,
+  unit: `<svg ${ICON_ATTRS}><rect x="3" y="9" width="18" height="6" rx="1"/><line x1="7" y1="9" x2="7" y2="12"/><line x1="11" y1="9" x2="11" y2="12"/><line x1="15" y1="9" x2="15" y2="12"/><line x1="19" y1="9" x2="19" y2="12"/></svg>`,
+  bmi: `<svg ${ICON_ATTRS}><path d="M5 16a7 7 0 0 1 14 0"/><line x1="12" y1="16" x2="15.2" y2="10.8"/><circle cx="12" cy="16" r="1.1"/><line x1="3" y1="19" x2="21" y2="19"/></svg>`,
+  tip: `<svg ${ICON_ATTRS}><path d="M6 3h12v16l-2-1.4-2 1.4-2-1.4-2 1.4-2-1.4-2 1.4V3z"/><line x1="8.5" y1="8" x2="15.5" y2="8"/><line x1="8.5" y1="11.2" x2="15.5" y2="11.2"/><line x1="8.5" y1="14.4" x2="12.5" y2="14.4"/></svg>`,
+  dday: `<svg ${ICON_ATTRS}><rect x="3" y="5" width="18" height="16" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="3" x2="8" y2="7"/><line x1="16" y1="3" x2="16" y2="7"/><circle cx="12" cy="15.2" r="1.5"/></svg>`,
+  typing: `<svg ${ICON_ATTRS}><rect x="2" y="6" width="20" height="12" rx="2"/><line x1="6" y1="10" x2="6" y2="10.01"/><line x1="9" y1="10" x2="9" y2="10.01"/><line x1="12" y1="10" x2="12" y2="10.01"/><line x1="15" y1="10" x2="15" y2="10.01"/><line x1="18" y1="10" x2="18" y2="10.01"/><line x1="7.5" y1="14.2" x2="16.5" y2="14.2"/></svg>`,
+  notes: `<svg ${ICON_ATTRS}><rect x="5" y="3" width="15" height="18" rx="2"/><line x1="8.5" y1="8" x2="16.5" y2="8"/><line x1="8.5" y1="12" x2="16.5" y2="12"/><line x1="8.5" y1="16" x2="13.5" y2="16"/><line x1="5" y1="7" x2="3" y2="7"/><line x1="5" y1="12" x2="3" y2="12"/><line x1="5" y1="17" x2="3" y2="17"/></svg>`,
+  timer: `<svg ${ICON_ATTRS}><line x1="9.5" y1="2" x2="14.5" y2="2"/><circle cx="12" cy="13.5" r="8"/><line x1="12" y1="13.5" x2="12" y2="9"/><line x1="12" y1="13.5" x2="15" y2="15.2"/></svg>`,
+  qr: `<svg ${ICON_ATTRS}><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14.5" y="14.5" width="2.5" height="2.5"/><rect x="18.5" y="14.5" width="2.5" height="2.5"/><rect x="14.5" y="18.5" width="2.5" height="2.5"/><rect x="18.5" y="18.5" width="2.5" height="2.5"/></svg>`,
+  loan: `<svg ${ICON_ATTRS}><rect x="2" y="6.5" width="20" height="11" rx="2"/><circle cx="12" cy="12" r="2.6"/><line x1="5.5" y1="9.5" x2="5.5" y2="9.51"/><line x1="18.5" y1="14.5" x2="18.5" y2="14.51"/></svg>`,
+  counter: `<svg ${ICON_ATTRS}><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="17" y2="12"/><line x1="4" y1="18" x2="13" y2="18"/></svg>`,
+  random: `<svg ${ICON_ATTRS}><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8" cy="8" r="1.1"/><circle cx="16" cy="8" r="1.1"/><circle cx="12" cy="12" r="1.1"/><circle cx="8" cy="16" r="1.1"/><circle cx="16" cy="16" r="1.1"/></svg>`,
+  base64: `<svg ${ICON_ATTRS}><polyline points="8 6 3 12 8 18"/><polyline points="16 6 21 12 16 18"/></svg>`,
+};
 const TOOLS = [
-  { id:'calc',  tag:'계산',   icon:'🧮', title:'계산기',            desc:'기본 사칙연산 계산기' },
-  { id:'unit',  tag:'변환',   icon:'📐', title:'단위 변환기',        desc:'길이·무게·온도 변환' },
-  { id:'bmi',   tag:'계산',   icon:'⚖️', title:'BMI 계산기',        desc:'체질량지수 계산' },
-  { id:'tip',   tag:'계산',   icon:'🧾', title:'영수증 분할 계산기', desc:'팁 포함 더치페이 계산' },
-  { id:'dday',  tag:'계산',   icon:'📅', title:'디데이 계산기',      desc:'목표일까지 남은 일수' },
-  { id:'fx',    tag:'변환',   icon:'💱', title:'환율 변환기',        desc:'실시간 통화 변환' },
-  { id:'notes', tag:'생산성', icon:'📝', title:'메모장',            desc:'간단한 브라우저 메모' },
-  { id:'timer', tag:'생산성', icon:'⏱️', title:'타이머',            desc:'카운트다운 타이머' },
-  { id:'qr',    tag:'생산성', icon:'🔳', title:'QR 코드 생성기',     desc:'텍스트/URL을 QR로 변환' },
+  { id:'calc',    tag:'계산',   title:'계산기',              desc:'기본 사칙연산 계산기' },
+  { id:'unit',    tag:'변환',   title:'단위 변환기',          desc:'길이·무게·온도 변환' },
+  { id:'bmi',     tag:'계산',   title:'BMI 계산기',          desc:'체질량지수 계산' },
+  { id:'tip',     tag:'계산',   title:'영수증 분할 계산기',   desc:'팁 포함 더치페이 계산' },
+  { id:'dday',    tag:'계산',   title:'디데이 계산기',        desc:'목표일까지 남은 일수' },
+  { id:'loan',    tag:'계산',   title:'대출 이자 계산기',     desc:'월 상환액 · 총 이자 계산' },
+  { id:'typing',  tag:'게임',   title:'타자 연습',            desc:'문장 타자 속도 · 정확도 측정' },
+  { id:'notes',   tag:'생산성', title:'메모장',              desc:'간단한 브라우저 메모' },
+  { id:'timer',   tag:'생산성', title:'타이머',              desc:'카운트다운 타이머' },
+  { id:'qr',      tag:'생산성', title:'QR 코드 생성기',       desc:'텍스트/URL을 QR로 변환' },
+  { id:'counter', tag:'생산성', title:'글자수 세기',          desc:'글자·단어·바이트 카운트' },
+  { id:'random',  tag:'생산성', title:'랜덤 번호 생성기',     desc:'무작위 숫자 · 목록 섞기' },
+  { id:'base64',  tag:'변환',   title:'Base64 변환기',       desc:'텍스트 ↔ Base64 인코딩/디코딩' },
 ];
 
 function renderCards(filter=''){
   const grid = document.getElementById('cardGrid');
   grid.innerHTML = '';
-  TOOLS.filter(t => (t.title+t.desc).toLowerCase().includes(filter.toLowerCase())).forEach(t=>{
+  TOOLS.filter(t => (t.title+t.desc).toLowerCase().includes(filter.toLowerCase())).forEach((t,i)=>{
     const card = document.createElement('button');
     card.className = 'card';
+    card.style.animationDelay = `${Math.min(i*0.05, 0.5)}s`;
     card.onclick = () => openTool(t.id);
-    card.innerHTML = `<span class="tag">${t.tag}</span><span class="icon">${t.icon}</span><h3>${t.title}</h3><p>${t.desc}</p>`;
+    card.innerHTML = `<span class="tag">${t.tag}</span><span class="icon">${ICONS[t.id]}</span><h3>${t.title}</h3><p>${t.desc}</p>`;
     grid.appendChild(card);
   });
 }
 function filterCards(){ renderCards(document.getElementById('searchInput').value); }
 renderCards();
 
-function showView(name){
+function pulseEl(el){
+  el.classList.remove('pop');
+  void el.offsetWidth;
+  el.classList.add('pop');
+}
+
+function displayView(name){
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
   document.getElementById('view-'+name).classList.add('active');
   window.scrollTo(0,0);
 }
-function openTool(id){
-  showView('tools');
+function displayTool(id){
+  displayView('tools');
   document.querySelectorAll('.tool-panel').forEach(p=>p.classList.remove('active'));
   document.getElementById('tool-'+id).classList.add('active');
   if(id==='unit') renderUnitOptions();
   if(id==='notes') renderNotes();
+  if(id==='typing') newTypingRound();
 }
+function showView(name){
+  displayView(name);
+  location.hash = name==='landing' ? '' : name;
+}
+function openTool(id){
+  displayTool(id);
+  location.hash = 'tool/'+id;
+}
+function handleHash(){
+  const hash = location.hash.replace(/^#\/?/, '');
+  if(!hash){ displayView('landing'); return; }
+  if(hash==='hub'){ displayView('hub'); return; }
+  const m = hash.match(/^tool\/([a-z0-9]+)$/i);
+  if(m && TOOLS.some(t=>t.id===m[1])){ displayTool(m[1]); return; }
+  displayView('landing');
+}
+window.addEventListener('hashchange', handleHash);
+document.addEventListener('DOMContentLoaded', handleHash);
 
 /* ============ 계산기 ============ */
 let calcCurrent = '0', calcPrevious = '', calcOperator = null, calcReset = false;
@@ -564,6 +752,7 @@ function calcEquals(){
   calcCurrent = Number.isNaN(r) ? '0으로 나눌 수 없음' : (Math.round(r*1e8)/1e8).toString();
   calcOperator = null; calcPrevious=''; calcReset = true;
   updateCalcDisplay();
+  pulseEl(document.getElementById('calcCurr'));
 }
 
 /* ============ 단위 변환기 ============ */
@@ -597,6 +786,7 @@ function calcUnit(){
   else { const f = UNIT_DEFS[cat].factor; result = val * f[from] / f[to]; }
   document.getElementById('unitResult').textContent = `${(Math.round(result*10000)/10000)} ${to}`;
   document.getElementById('unitFormula').textContent = `${val} ${from} = ${(Math.round(result*10000)/10000)} ${to}`;
+  pulseEl(document.getElementById('unitResult'));
 }
 
 /* ============ BMI ============ */
@@ -612,6 +802,7 @@ function calcBmi(){
   else cat='비만';
   document.getElementById('bmiResult').textContent = bmi.toFixed(1);
   document.getElementById('bmiCategory').textContent = `분류: ${cat}`;
+  pulseEl(document.getElementById('bmiResult'));
 }
 
 /* ============ 영수증 분할 ============ */
@@ -623,6 +814,7 @@ function calcTip(){
   const per = total/people;
   document.getElementById('tipResult').textContent = `₩${Math.round(per).toLocaleString()} / 인`;
   document.getElementById('tipSub').textContent = `총 ${Math.round(total).toLocaleString()}원 (팁 ${Math.round(amt*pct/100).toLocaleString()}원 포함) ÷ ${people}명`;
+  pulseEl(document.getElementById('tipResult'));
 }
 
 /* ============ 디데이 ============ */
@@ -634,24 +826,96 @@ function calcDday(){
   const diff = Math.round((target-today)/86400000);
   document.getElementById('ddayResult').textContent = diff===0 ? 'D-Day' : (diff>0 ? `D-${diff}` : `D+${Math.abs(diff)}`);
   document.getElementById('ddaySub').textContent = diff>=0 ? `${diff}일 남았습니다` : `${Math.abs(diff)}일 지났습니다`;
+  pulseEl(document.getElementById('ddayResult'));
 }
 
-/* ============ 환율 ============ */
-async function calcFx(){
-  const amt = parseFloat(document.getElementById('fxAmount').value)||0;
-  const from = document.getElementById('fxFrom').value, to = document.getElementById('fxTo').value;
-  document.getElementById('fxResult').textContent = '조회 중...';
-  document.getElementById('fxSub').textContent = '\u00A0';
-  try{
-    const res = await fetch(`https://api.frankfurter.app/latest?amount=${amt}&from=${from}&to=${to}`);
-    const data = await res.json();
-    const value = data.rates[to];
-    document.getElementById('fxResult').textContent = `${value.toLocaleString(undefined,{maximumFractionDigits:2})} ${to}`;
-    document.getElementById('fxSub').textContent = `${amt} ${from} 기준 · ${data.date} 환율`;
-  }catch(e){
-    document.getElementById('fxResult').textContent = '조회 실패';
-    document.getElementById('fxSub').textContent = '네트워크 연결을 확인해주세요';
+/* ============ 타자 게임 ============ */
+const TYPING_SENTENCES = [
+  "설계는 명확할수록 아름답다",
+  "오늘도 커피 한 잔으로 하루를 시작한다",
+  "느린 것보다 멈추는 것을 두려워하라",
+  "작은 습관이 큰 변화를 만든다",
+  "비 오는 날에는 우산을 꼭 챙기세요",
+  "코드는 읽는 사람을 위해 작성한다",
+  "생각을 정리하면 길이 보인다",
+  "꾸준함이 재능을 이긴다",
+  "바다는 그 깊이를 함부로 보여주지 않는다",
+  "연습은 완벽을 만들지 않지만 습관을 만든다",
+  "가장 어두운 밤도 끝은 있다",
+  "질문을 두려워하지 않는 사람이 성장한다",
+  "단순함이 최고의 정교함이다",
+  "매일 한 걸음씩 나아가면 된다",
+  "시작이 반이라는 말은 늘 옳다",
+  "지도보다 나침반이 필요한 순간이 있다",
+];
+let typingTarget = '';
+let typingStartTime = null;
+let typingTimerInterval = null;
+let typingFinished = false;
+
+function renderTypingTarget(typed){
+  let html = '';
+  for(let i=0;i<typingTarget.length;i++){
+    const ch = typingTarget[i];
+    let cls = 'pending';
+    if(i < typed.length) cls = typed[i]===ch ? 'correct' : 'incorrect';
+    else if(i === typed.length) cls = 'pending current';
+    html += `<span class="${cls}">${ch===' ' ? '&nbsp;' : ch}</span>`;
   }
+  document.getElementById('typingTarget').innerHTML = html;
+}
+function newTypingRound(){
+  typingTarget = TYPING_SENTENCES[Math.floor(Math.random()*TYPING_SENTENCES.length)];
+  typingStartTime = null;
+  typingFinished = false;
+  clearInterval(typingTimerInterval);
+  const input = document.getElementById('typingInput');
+  input.value = '';
+  input.disabled = false;
+  document.getElementById('typingResultMsg').textContent = '\u00A0';
+  document.getElementById('typeTime').textContent = '0.0s';
+  document.getElementById('typeCpm').textContent = '0';
+  document.getElementById('typeAcc').textContent = '100%';
+  renderTypingTarget('');
+  input.focus();
+}
+function updateTypingTimer(){
+  if(!typingStartTime) return;
+  document.getElementById('typeTime').textContent = ((Date.now()-typingStartTime)/1000).toFixed(1)+'s';
+}
+function typingAccuracy(typed){
+  let correct=0;
+  for(let i=0;i<typed.length;i++){ if(typed[i]===typingTarget[i]) correct++; }
+  return typed.length ? Math.round((correct/typed.length)*100) : 100;
+}
+function onTypingInput(){
+  if(typingFinished) return;
+  const input = document.getElementById('typingInput');
+  let typed = input.value;
+  if(!typingStartTime && typed.length>0){
+    typingStartTime = Date.now();
+    typingTimerInterval = setInterval(updateTypingTimer, 100);
+  }
+  if(typed.length > typingTarget.length){
+    typed = typed.slice(0, typingTarget.length);
+    input.value = typed;
+  }
+  renderTypingTarget(typed);
+  document.getElementById('typeAcc').textContent = typingAccuracy(typed)+'%';
+  if(typed.length === typingTarget.length && typed.length>0) finishTyping(typed);
+}
+function finishTyping(typed){
+  typingFinished = true;
+  clearInterval(typingTimerInterval);
+  const elapsed = Math.max((Date.now()-typingStartTime)/1000, 0.1);
+  const cpm = Math.round((typingTarget.length/elapsed)*60);
+  const acc = typingAccuracy(typed);
+  document.getElementById('typeTime').textContent = elapsed.toFixed(1)+'s';
+  document.getElementById('typeCpm').textContent = cpm.toLocaleString();
+  document.getElementById('typeAcc').textContent = acc+'%';
+  document.getElementById('typingInput').disabled = true;
+  document.getElementById('typingResultMsg').textContent = `완료! ${elapsed.toFixed(1)}초 · 분당 ${cpm}타 · 정확도 ${acc}% — "새 문장"을 눌러 다시 도전하세요.`;
+  pulseEl(document.getElementById('typeCpm'));
 }
 
 /* ============ 메모장 ============ */
@@ -723,6 +987,147 @@ function downloadQr(){
   link.href = canvas.toDataURL();
   link.click();
 }
+
+/* ============ 대출 이자 계산기 ============ */
+function calcLoan(){
+  const principal = parseFloat(document.getElementById('loanAmount').value);
+  const annualRate = parseFloat(document.getElementById('loanRate').value);
+  const months = parseInt(document.getElementById('loanMonths').value);
+  const resultEl = document.getElementById('loanResult'), subEl = document.getElementById('loanSub');
+  if(!principal || months<=0){ resultEl.textContent='—'; subEl.textContent='\u00A0'; return; }
+  const r = (annualRate||0)/100/12;
+  let monthly;
+  if(r===0){ monthly = principal/months; }
+  else { monthly = principal * r * Math.pow(1+r, months) / (Math.pow(1+r, months)-1); }
+  const totalPay = monthly*months;
+  const totalInterest = totalPay - principal;
+  resultEl.textContent = `₩${Math.round(monthly).toLocaleString()} / 월`;
+  subEl.textContent = `총 상환액 ${Math.round(totalPay).toLocaleString()}원 · 총 이자 ${Math.round(totalInterest).toLocaleString()}원`;
+  pulseEl(resultEl);
+}
+
+/* ============ 글자수 세기 ============ */
+function calcCounter(){
+  const text = document.getElementById('counterInput').value;
+  const charCount = text.length;
+  const charNoSpace = text.replace(/\s/g,'').length;
+  const wordCount = text.trim() === '' ? 0 : text.trim().split(/\s+/).length;
+  const byteCount = new TextEncoder().encode(text).length;
+  document.getElementById('countChar').textContent = charCount.toLocaleString();
+  document.getElementById('countCharNoSpace').textContent = charNoSpace.toLocaleString();
+  document.getElementById('countWord').textContent = wordCount.toLocaleString();
+  document.getElementById('countByte').textContent = byteCount.toLocaleString();
+}
+
+/* ============ 랜덤 번호 생성기 ============ */
+function genRandom(){
+  const min = parseInt(document.getElementById('randMin').value)||0;
+  const max = parseInt(document.getElementById('randMax').value)||0;
+  const resultEl = document.getElementById('randResult');
+  if(min>max){ resultEl.textContent = '최소값이 최대값보다 큽니다'; return; }
+  const val = Math.floor(Math.random()*(max-min+1))+min;
+  resultEl.textContent = val.toLocaleString();
+  pulseEl(resultEl);
+}
+function genShuffle(){
+  const raw = document.getElementById('shuffleInput').value;
+  const items = raw.split(',').map(s=>s.trim()).filter(Boolean);
+  const subEl = document.getElementById('shuffleResult');
+  if(items.length<2){ subEl.textContent = '쉼표로 구분된 항목을 2개 이상 입력해주세요.'; return; }
+  for(let i=items.length-1; i>0; i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [items[i], items[j]] = [items[j], items[i]];
+  }
+  subEl.textContent = items.join('  →  ');
+  pulseEl(subEl);
+}
+
+/* ============ Base64 변환기 ============ */
+function b64Encode(){
+  const input = document.getElementById('b64Input').value;
+  const hint = document.getElementById('b64Hint');
+  try{
+    const bytes = new TextEncoder().encode(input);
+    let binary = '';
+    bytes.forEach(b => binary += String.fromCharCode(b));
+    document.getElementById('b64Output').value = btoa(binary);
+    hint.textContent = '텍스트를 Base64로 인코딩했습니다.';
+  }catch(e){
+    document.getElementById('b64Output').value = '';
+    hint.textContent = '인코딩할 수 없는 입력입니다.';
+  }
+}
+function b64Decode(){
+  const input = document.getElementById('b64Input').value.trim();
+  const hint = document.getElementById('b64Hint');
+  try{
+    const binary = atob(input);
+    const bytes = Uint8Array.from(binary, c => c.charCodeAt(0));
+    document.getElementById('b64Output').value = new TextDecoder().decode(bytes);
+    hint.textContent = 'Base64를 텍스트로 디코딩했습니다.';
+  }catch(e){
+    document.getElementById('b64Output').value = '';
+    hint.textContent = '올바른 Base64 형식이 아닙니다.';
+  }
+}
+
+/* ============ 복사 버튼 ============ */
+const COPY_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>`;
+const CHECK_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`;
+
+function fallbackCopy(text){
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position = 'fixed';
+  ta.style.opacity = '0';
+  document.body.appendChild(ta);
+  ta.select();
+  try{ document.execCommand('copy'); }catch(e){}
+  document.body.removeChild(ta);
+}
+async function copyResult(btn, id){
+  const el = document.getElementById(id);
+  if(!el) return;
+  const raw = (el.tagName==='TEXTAREA' || el.tagName==='INPUT') ? el.value.trim() : el.textContent.trim();
+  if(!raw || raw==='—' || raw==='조회 중...' || raw==='\u00A0') return;
+  try{
+    if(navigator.clipboard && window.isSecureContext){ await navigator.clipboard.writeText(raw); }
+    else{ fallbackCopy(raw); }
+  }catch(e){ fallbackCopy(raw); }
+  const original = btn.innerHTML;
+  const isInline = btn.classList.contains('copy-inline');
+  btn.classList.add('copied');
+  if(isInline){
+    btn.innerHTML = CHECK_ICON + `<span class="copy-label">복사됨</span>`;
+  }else{
+    btn.innerHTML = CHECK_ICON;
+  }
+  setTimeout(()=>{ btn.classList.remove('copied'); btn.innerHTML = original; }, 1200);
+}
+function initCopyButtons(){
+  document.querySelectorAll('.copy-btn[data-copy]').forEach(btn=>{
+    btn.innerHTML = COPY_ICON;
+    btn.addEventListener('click', ()=> copyResult(btn, btn.getAttribute('data-copy')));
+  });
+  document.querySelectorAll('.copy-inline[data-copy]').forEach(btn=>{
+    const label = btn.querySelector('.copy-label');
+    btn.innerHTML = COPY_ICON + (label ? label.outerHTML : '<span class="copy-label">복사</span>');
+    btn.addEventListener('click', ()=> copyResult(btn, btn.getAttribute('data-copy')));
+  });
+}
+document.addEventListener('DOMContentLoaded', initCopyButtons);
+
+/* ============ 복사(선택) 방지 ============ */
+document.addEventListener('contextmenu', function(e){
+  const tag = e.target.tagName;
+  if(tag !== 'INPUT' && tag !== 'TEXTAREA') e.preventDefault();
+});
+document.addEventListener('dragstart', function(e){ e.preventDefault(); });
+document.addEventListener('selectstart', function(e){
+  const tag = e.target.tagName;
+  if(tag !== 'INPUT' && tag !== 'TEXTAREA') e.preventDefault();
+});
+
 </script>
 </body>
 </html>
